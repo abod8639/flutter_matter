@@ -78,7 +78,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
         return DeviceProvisioningPage(
           payload: payload,
           onboardingPayload: code,
-          wiFiCredentials: WiFiCredentials(ssid: currentSsid!, password: ''),
+          wiFiCredentials: WiFiCredentials(ssid: currentSsid, password: ''),
         );
       }
       return WifiInputPage(
