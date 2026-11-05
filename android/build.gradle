@@ -1,29 +1,9 @@
+plugins {
+    id 'com.android.library'
+}
+
 group 'com.tyx.flutter_matter'
 version '1.0-SNAPSHOT'
-
-buildscript {
-    ext.kotlin_version = '1.7.10'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
-}
-
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 android {
     if (project.android.hasProperty("namespace")) {
@@ -41,6 +21,8 @@ android {
         jvmTarget = '1.8'
     }
 
+
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
@@ -55,6 +37,10 @@ android {
         implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
         implementation 'com.github.Tan-yi-xiong:flutter_matter_android_prefixed:1.0.5'
         // implementation 'com.tyx.flutter_matter:flutter_matter_android_prefixed:1.0.0'
+        
+        // Google Play Services for Matter Commissioning API
+        implementation 'com.google.android.gms:play-services-home:16.0.0'
+
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.0.0'
     }
