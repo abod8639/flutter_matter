@@ -6,7 +6,7 @@ import 'package:flutter_matter/src/utils.dart';
 import '../flutter_matter_method_channel.dart';
 
 abstract class CallbackHandler<T> implements MethodCallHandler {
-  Map<String, T> _handlers = {};
+  final Map<String, T> _handlers = {};
 
   CallbackHandler() {
     FlutterMatterPlatform.instance.addHandler(this);

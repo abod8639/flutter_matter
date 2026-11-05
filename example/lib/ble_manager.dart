@@ -8,7 +8,7 @@ import 'package:collection/collection.dart';
 
 class BleManager {
   static final flutterReactiveBle = FlutterReactiveBle();
-  static final connecteds = Map<String, BluetoothDevice>();
+  static final connecteds = <String, BluetoothDevice>{};
   static final matter_uuid = Guid.fromString("0000fff6-0000-1000-8000-00805f9b34fb");
 
   static Future<ScanResult?> getDevice(OnboardingPayload payload) async {
@@ -21,7 +21,6 @@ class BleManager {
         (element) => element.advertisementData.serviceData.containsKey(matter_uuid));
       if (dev != null) {
         final data = dev.advertisementData.serviceData[matter_uuid]!.reversed.toList();
-        print('object ${int.parse(HEX.encode(data.sublist(data.length - 3)), radix: 16) >> 8}');
         if (payload.discriminator == int.parse(HEX.encode(data.sublist(data.length - 3)), radix: 16) >> 8) {
           FlutterBluePlus.stopScan();
           ss.cancel();
@@ -31,26 +30,19 @@ class BleManager {
     });
 
     FlutterBluePlus.cancelWhenScanComplete(ss);
-    FlutterBluePlus.startScan(timeout: Duration(seconds: 15));
-    return completer.future.timeout(Duration(seconds: 15)).catchError((_) => null).whenComplete(() => ss.cancel());
+    FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
+    return completer.future.timeout(const Duration(seconds: 15)).catchError((_) => null).whenComplete(() => ss.cancel());
   }
 
   static Future<bool> connect(ScanResult result) async {
     Completer<bool> completer = Completer();
     connecteds[result.device.remoteId.toString()] = result.device;
-    await result.device.connect(timeout: Duration(seconds: 5)).catchError((_) {
+    await result.device.connect(timeout: const Duration(seconds: 5)).catchError((_) {
       completer.complete(false);
       
     });
     if (result.device.isConnected) {
       await result.device.discoverServices().then((value) {
-        value.forEach((element) {
-          print('${element.serviceUuid}: ');
-          print("Characteristics: ");
-          element.characteristics.forEach((char) {
-            print('  ${char.uuid}');
-          });
-        });
         completer.complete(true);
       });
     }

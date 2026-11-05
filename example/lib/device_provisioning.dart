@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,7 +60,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('Vendor: ${widget.payload.vendorId.toRadixString(16)}\nProduct: ${widget.payload.productId.toRadixString(16)}\nSetup code: ${widget.payload.setupPinCode.toRadixString(16)}'),
-            SizedBox(height: 16,),
+            const SizedBox(height: 16,),
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
@@ -79,13 +78,13 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (!isFinish)
-              Text('Current Step: ${stage}', style: TextStyle(fontSize: 20),),
+              Text('Current Step: $stage', style: const TextStyle(fontSize: 20),),
             if (isFinish)
-              Text('Provisioning${errorCode == 0 ? 'success' : 'fail'} code $errorCode', style: TextStyle(fontSize: 20),),
+              Text('Provisioning${errorCode == 0 ? 'success' : 'fail'} code $errorCode', style: const TextStyle(fontSize: 20),),
             if (isFinish)
               ElevatedButton(onPressed: () {
                 Navigator.pop(context);
-              }, child: Text('Back')),
+              }, child: const Text('Back')),
           ],
         ),
       );
@@ -105,7 +104,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
     // if you not use custom ble stack, unnecessary care about the ble code
     if (Platform.isAndroid && !isShare) { 
       final device = await BleManager.getDevice(widget.payload);
-      print("find device $device");
+      debugPrint("find device $device");
       if (device != null) {
         for (var i = 0; i < 3; i++) {
           final success = await BleManager.connect(device);
@@ -128,15 +127,15 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
 
       final service = BleManager.getConnDevice()!.servicesList.firstWhereOrNull(
         (element) => element.serviceUuid == BleManager.matter_uuid);
-      service!.characteristics.forEach((chr) {
+      for (var chr in service!.characteristics) {
         final ss = chr.onValueReceived.listen((event) {
-          print('onValueReceived ${chr.characteristicUuid} ${event}');
+          debugPrint('onValueReceived ${chr.characteristicUuid} $event');
           BLELayerPlatform.handleIndicationReceived(connectId, Uint8List.fromList(BleManager.matter_uuid.bytes), Uint8List.fromList(chr.characteristicUuid.bytes), Uint8List.fromList(event)).then((value) {
-            print('handleIndicationReceived $value');
+            debugPrint('handleIndicationReceived $value');
           });
         });
         BleManager.getConnDevice()!.cancelWhenDisconnected(ss);
-      });
+      }
       await BLELayerPlatform.setBlePlatformDelegate(null);
       await BLELayerPlatform.setBlePlatformDelegate(this);
     }
@@ -144,7 +143,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
     keypair = await genAsymmetricKeyPair();
     final kp = keypair;
     cert = await getX509Certificate();
-    this.fabricId = await getFabricId();
+    fabricId = await getFabricId();
     final cp = ControllerParams(
       skipCommissioningComplete: false,
       fabricId: fabricId!,
@@ -171,7 +170,6 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
       attestationDelegate: this,
       completionListener: this
     ).catchError((e,s) {
-      print('pairDevice error $e $s');
       setState(() {
         errorCode = -2;
         isFinish = true;
@@ -182,12 +180,11 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   /// CompletionListener callback start ==================================
 
   void onCloseBleComplete() {
-    print('onCloseBleComplete');
+  debugPrint('onCloseBleComplete');
   }
   
   @override
   void onCommissioningComplete(int? nodeId, int errorCode) {
-    print('onCommissioningComplete $nodeId $errorCode');
     setState(() {
       saveDevice(Device(nodeId!));
       this.errorCode = errorCode;
@@ -198,7 +195,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   
   @override
   void onCommissioningStatusUpdate(int nodeId, String stage, int errorCode) {
-    print('onCommissioningStatusUpdate $nodeId $stage $errorCode');
+    debugPrint('onCommissioningStatusUpdate $nodeId $stage $errorCode');
      setState(() {
       this.stage = stage;
      });
@@ -206,37 +203,37 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   
   @override
   void onConnectDeviceComplete() {
-    print('onConnectDeviceComplete');
+    debugPrint('onConnectDeviceComplete');
   }
   
   @override
   void onError(Exception error) {
-    print('onError $error');
+    debugPrint('onError $error');
   }
   
   @override
   void onICDRegistrationInfoRequired() {
-    print('onICDRegistrationInfoRequired');
+    debugPrint('onICDRegistrationInfoRequired');
   }
 
   @override
   void onICDRegistrationComplete(int errorCode, ICDDeviceInfo? icdDeviceInfo) {
-    print('onICDRegistrationComplete errorCode=$errorCode icdDeviceInfo=$icdDeviceInfo');
+    debugPrint('onICDRegistrationComplete errorCode=$errorCode icdDeviceInfo=$icdDeviceInfo');
   }
   
   @override
   void onNotifyChipConnectionClosed() {
-    print('onNotifyChipConnectionClosed');
+    debugPrint('onNotifyChipConnectionClosed');
   }
   
   @override
   void onOpCSRGenerationComplete(Uint8List csr) {
-    print('onOpCSRGenerationComplete ${base64.encode(csr)}');
+    debugPrint('onOpCSRGenerationComplete ${base64.encode(csr)}');
   }
   
   @override
   void onPairingComplete(int errorCode) {
-    print('onPairingComplete $errorCode');
+    debugPrint('onPairingComplete $errorCode');
     if (errorCode != 0) {
       setState(() {
         this.errorCode = errorCode;
@@ -248,17 +245,17 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   
   @override
   void onPairingDeleted(int errorCode) {
-    print('onPairingDeleted $errorCode');
+    debugPrint('onPairingDeleted $errorCode');
   }
   
   @override
   void onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
-    print('onReadCommissioningInfo $vendorId $productId $wifiEndpointId $threadEndpointId');
+    debugPrint('onReadCommissioningInfo $vendorId $productId $wifiEndpointId $threadEndpointId');
   }
   
   @override
   void onStatusUpdate(int status) {
-    print('onStatusUpdate $status');
+    debugPrint('onStatusUpdate $status');
   }
 
   /// CompletionListener callback end ==================================
@@ -270,7 +267,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   
   @override
   void onDeviceAttestationCompleted(int devicePtr, AttestationInfo? attestationInfo, int errorCode) {
-    print('onDeviceAttestationCompleted $errorCode');
+    debugPrint('onDeviceAttestationCompleted $errorCode');
     deviceController!.continueCommissioning(devicePtr, true);
   }
 
@@ -288,7 +285,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   
   @override
   Future<int> getMTU(connObj) async {
-    print('getMTU $connObj -> ${BleManager.getConnDevice()!.mtuNow}');
+    debugPrint('getMTU $connObj -> ${BleManager.getConnDevice()!.mtuNow}');
     return BleManager.getConnDevice()!.mtuNow;
   }
   
@@ -312,7 +309,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   
   @override
   Future<bool> sendWriteRequest(connObj, Uint8List svcId, Uint8List charId, Uint8List pBuf) async {
-    print("sendWriteRequest $connObj ${HEX.encode(svcId)} ${HEX.encode(charId)} ${HEX.encode(pBuf)}");
+    debugPrint("sendWriteRequest $connObj ${HEX.encode(svcId)} ${HEX.encode(charId)} ${HEX.encode(pBuf)}");
     bool writeSuccess = false;
     final service = BleManager.getConnDevice()!.servicesList.firstWhereOrNull((element) => element.serviceUuid == Guid.fromBytes(svcId));
     final char = service?.characteristics.firstWhereOrNull((element) => element.characteristicUuid == Guid.fromBytes(charId));
@@ -337,7 +334,7 @@ class _DeviceProvisioningPageState extends State<DeviceProvisioningPage> impleme
   
   @override
   Future<bool> subscribeCharacteristic(connObj, Uint8List svcId, Uint8List charId) async {
-    print("subscribeCharacteristic $connObj ${HEX.encode(svcId)} ${HEX.encode(charId)}");
+    debugPrint("subscribeCharacteristic $connObj ${HEX.encode(svcId)} ${HEX.encode(charId)}");
     final service = BleManager.getConnDevice()!.servicesList.firstWhereOrNull((element) => element.serviceUuid == Guid.fromBytes(svcId));
     final char = service?.characteristics.firstWhereOrNull((element) => element.characteristicUuid == Guid.fromBytes(charId));
     return await char?.setNotifyValue(true).catchError((e) => false).then((v) {

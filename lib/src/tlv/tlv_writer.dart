@@ -101,13 +101,17 @@ class TlvWriter {
 
   TlvWriter putSignedLongArray(Tag tag, List<int> array) {
     startArray(tag);
-    array.forEach((it) => put(AnonymousTag.instance, it));
+    for (var it in array) {
+      put(AnonymousTag.instance, it);
+    }
     return endArray();
   }
 
   TlvWriter putByteStringArray(Tag tag, List<int> array) {
     startArray(tag);
-    array.forEach((it) => put(AnonymousTag.instance, it));
+    for (var it in array) {
+      put(AnonymousTag.instance, it);
+    }
     return endArray();
   }
 

@@ -26,12 +26,12 @@ class _ConnectedDeviceCallbackWarp extends ConnectedDeviceCallback {
 class OpenCommissioningCallbackWarp extends OpenCommissioningCallback {
   @override
   void onError(int status, Object? connectContext) {
-    print("OpenCommissioningCallbackWarp onError");
+    debugPrint("OpenCommissioningCallbackWarp onError");
   }
 
   @override
   void onSuccess(Object? connectContext, String manualPairingCode, String qrCode) {
-    print('OpenCommissioningCallbackWarp onSuccess $manualPairingCode $qrCode');
+    debugPrint('OpenCommissioningCallbackWarp onSuccess $manualPairingCode $qrCode');
   }
 }
 
@@ -51,10 +51,10 @@ class _ControlPageState extends State<ControlPage>
   bool connectting = false;
   ChipDeviceController? chipDeviceController;
   final tabs = [
-    Tab(text: 'On/Off'),
-    Tab(text: 'Read/Write'),
+    const Tab(text: 'On/Off'),
+    const Tab(text: 'Read/Write'),
     // Tab(text: 'Subscribe'),
-    Tab(text: 'OCW'),
+    const Tab(text: 'OCW'),
   ];
 
   @override
@@ -62,12 +62,12 @@ class _ControlPageState extends State<ControlPage>
     super.initState();
     tabController = TabController(length: tabs.length, vsync: this);
     createChipDeviceController().then((value) {
-      this.chipDeviceController = value;
+      chipDeviceController = value;
     });
   }
 
   void _changeConnectState() {
-    if (this.chipDeviceController == null || connectting) {
+    if (chipDeviceController == null || connectting) {
       return;
     }
     connectting = true;
@@ -79,7 +79,7 @@ class _ControlPageState extends State<ControlPage>
           }, onConnectedFun: (context) {
             setState(() {
               connectting = false;
-              this.connectContext = context;
+              connectContext = context;
             });
           }));
     } else {
@@ -98,7 +98,7 @@ class _ControlPageState extends State<ControlPage>
     chipDeviceController!.read(
       widget.device.nodeId, 
       connectContext: connectContext,
-      new ReportCallbackWarp(
+      ReportCallbackWarp(
         onReportFun: (nodeState) {
           final tlvData = nodeState.endpoints[endpointId]?.clusters[clusterId]?.attributes[attributeId]?.tlv;
           if (tlvData == null) {
@@ -156,13 +156,13 @@ class _ControlPageState extends State<ControlPage>
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {
         _unPairDevice();
-      }, child: Icon(Icons.delete), backgroundColor: Colors.red,),
+      }, backgroundColor: Colors.red, child: const Icon(Icons.delete),),
       body: TabBarView(
         controller: tabController,
         children: tabs.mapIndexed((index, e) {
           return Builder(builder: (_) {
             if (connectContext == null) {
-              return Center(child: Text("Device not connected"));
+              return const Center(child: Text("Device not connected"));
             } else {
               if (tabs[index].text == 'OCW') {
                 return OCWTabPage(
@@ -295,7 +295,7 @@ class _OnOffPageState extends State<OnOffPage> {
   @override
   void dispose() {
     super.dispose();
-    subscribedIds.forEach((element) {
+    for (var element in subscribedIds) {
       widget.chipDeviceController.getFabricIndex().then((value) {
         if (value == null) {
           return;
@@ -303,7 +303,7 @@ class _OnOffPageState extends State<OnOffPage> {
         widget.chipDeviceController
             .unSubscription(value, widget.controlDevice.nodeId, element);
       });
-    });
+    }
   }
 
   @override
@@ -373,11 +373,11 @@ class OCWTabPage extends StatelessWidget {
                                 180,
                                 3850,
                                 20202021,
-                                new OpenCommissioningCallbackWarp())
+                                OpenCommissioningCallbackWarp())
                             .then((value) {
-                          showToast("Success, code: ${value}");
+                          showToast("Success, code: $value");
                         }).catchError((e, s) {
-                          print(s);
+                          debugPrint(s);
                           showToast("failed");
                         });
                       },
@@ -390,7 +390,7 @@ class OCWTabPage extends StatelessWidget {
                     timedRequestTimeoutMs: 2000,
                     imTimeoutMs: 0);
               },
-              child: Text('openPairingWindow'))
+              child: const Text('openPairingWindow'))
         ],
       ),
     );
@@ -439,7 +439,7 @@ class _Read_WritePageState extends State<Read_WritePage> {
     widget.chipDeviceController.read(
       widget.controlDevice.nodeId, 
       connectContext: widget.controlContext,
-      new ReportCallbackWarp(
+      ReportCallbackWarp(
         onReportFun: (nodeState) {
           final tlvData = nodeState.endpoints[endpointId]?.clusters[clusterId]?.attributes[attributeId]?.tlv;
           if (tlvData == null) {
@@ -448,7 +448,7 @@ class _Read_WritePageState extends State<Read_WritePage> {
           }
           TlvReader reader = TlvReader(tlvData);
           setState(() {
-            this._readValue = reader.getString(AnonymousTag.instance).toString();
+            _readValue = reader.getString(AnonymousTag.instance).toString();
           });
         },
         onErrorFun: (_, __, ___) {
@@ -471,19 +471,19 @@ class _Read_WritePageState extends State<Read_WritePage> {
         children: [
           Row(
             children: [
-              Text("NodeLabel: "),
-              SizedBox(width: 5,),
+              const Text("NodeLabel: "),
+              const SizedBox(width: 5,),
               Expanded(
                 child: TextField(
                   controller: editingController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Enter a value"
                   ),
                 ),
               ),
             ],
           ),
-          SizedBox(height: 16,),
+          const SizedBox(height: 16,),
           ElevatedButton(
             onPressed: () {
               final writeValue = editingController.text;
@@ -493,16 +493,16 @@ class _Read_WritePageState extends State<Read_WritePage> {
               }
               _writeNodeLabel(writeValue);
             },
-            child: Text("Write NodeLabel"),
+            child: const Text("Write NodeLabel"),
           ),
-          SizedBox(height: 32,),
+          const SizedBox(height: 32,),
           ElevatedButton(
             onPressed: () {
               _readNodeLabel();
             },
-            child: Text("Read NodeLabel"),
+            child: const Text("Read NodeLabel"),
           ),
-          SizedBox(height: 12,),
+          const SizedBox(height: 12,),
           Text("Device NodeLabel Value: $_readValue")
         ],
       ),

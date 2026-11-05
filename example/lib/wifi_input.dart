@@ -15,8 +15,8 @@ class WifiInputPage extends StatefulWidget {
 }
 
 class _WifiInputPageState extends State<WifiInputPage> {
-  TextEditingController _ssidController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _ssidController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
@@ -31,21 +31,21 @@ class _WifiInputPageState extends State<WifiInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('WifiInfo'),
+        title: const Text('WifiInfo'),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(children: [
           TextField(
             controller: _ssidController,
-            decoration: InputDecoration(hintText: 'WifiName'),
+            decoration: const InputDecoration(hintText: 'WifiName'),
           ),
           TextField(
             controller: _passwordController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 hintText: 'WifiPassword (optional for open networks)'),
           ),
-          SizedBox(
+          const SizedBox(
             height: 16,
           ),
           ElevatedButton(
@@ -70,7 +70,7 @@ class _WifiInputPageState extends State<WifiInputPage> {
                   );
                 }));
               },
-              child: Text('下一步'))
+              child: const Text('下一步'))
         ]),
       ),
     );

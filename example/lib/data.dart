@@ -59,7 +59,7 @@ class MyKeypairDelegate implements KeypairDelegate {
       ASN1Integer(signature.r),
       ASN1Integer(signature.s),
     ]).encode();
-    print('ecdsaSignMessage ${message}');
+    print('ecdsaSignMessage $message');
     return encoded;
   }
 
@@ -72,7 +72,7 @@ class MyKeypairDelegate implements KeypairDelegate {
   Uint8List getPublicKey() {
     print('getPublicKey call');
 
-    if (this.pubKey != null) {
+    if (pubKey != null) {
       print('reutrn pubkey');
       return pubKey!;
     }

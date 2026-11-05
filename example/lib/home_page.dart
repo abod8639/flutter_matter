@@ -39,11 +39,11 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Flutter Matter Plugin Demo')),
       floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (context) {
-                return OnboardingWidget();
+                return const OnboardingWidget();
               },
             ));
           }),

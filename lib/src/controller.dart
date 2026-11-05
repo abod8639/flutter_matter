@@ -1,8 +1,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_matter/flutter_matter.dart';
 import 'package:flutter_matter/flutter_matter_method_channel.dart';
@@ -12,14 +10,6 @@ import 'package:flutter_matter/src/constant.dart';
 import 'package:flutter_matter/src/utils.dart';
 
 import 'exception.dart';
-import 'model/icd_device_info.dart';
-import 'model/attribute_write_request.dart';
-import 'model/chip_attribute_path.dart';
-import 'model/chip_event_path.dart';
-import 'model/data_version_filter.dart';
-import 'model/invoke_element.dart';
-import 'model/node_state.dart';
-import 'model/status.dart';
 
 const _hostName = 'devicecontroller';
 
@@ -55,9 +45,8 @@ class NetworkCredentials implements TransportObject {
         threadCredentials = thread;
 
   /// Legacy constructor kept for backward compatibility — WiFi only.
-  NetworkCredentials({required WiFiCredentials wifiCredentials})
-      : wifiCredentials = wifiCredentials,
-        threadCredentials = null;
+  NetworkCredentials({required WiFiCredentials this.wifiCredentials})
+      : threadCredentials = null;
 
   @override
   String encode() {
@@ -152,7 +141,7 @@ class KeypairDelegateCallbackHandler extends CallbackHandler<KeypairDelegate> {
 
 final _keypairDelegateCallbackHandler = KeypairDelegateCallbackHandler();
 
-/** Represents information relating to NOC CSR. */
+/// Represents information relating to NOC CSR.
 class CSRInfo {
 
   final Uint8List nonce;
@@ -551,7 +540,7 @@ class ChipDeviceController implements MethodCallHandler {
   late FlutterMatterPlatform _channelFlutterMatter;
   final String? _platformDeviceControllerHandle;
   DeviceAttestationDelegate? deviceAttestationDelegate;
-  String? _keypairDelegateHandleId;
+  final String? _keypairDelegateHandleId;
   bool _isRunning = false;
   final Map<String, OpenCommissioningCallback> _openCommissioningCallbacks = {};
   final Map<String, InvokeCallback> _invokeCallbacks = {};
@@ -758,9 +747,8 @@ class ChipDeviceController implements MethodCallHandler {
             callback.onReport(
               NodeState.fromJson(checkCallArgNotNull(decodeArgs, "nodeState"))
             );
-          } catch (e, s) {
+          } catch (e) {
             matterPrint('ReportCallback onReport error $e');
-            print(s);
           } 
           return createPlatformCallSuccessResult();
         case "onError":
@@ -930,7 +918,7 @@ class ChipDeviceController implements MethodCallHandler {
   void destroy() {
     _channelFlutterMatter.removeHandler(this);
     if (_keypairDelegateHandleId != null) {
-      _keypairDelegateCallbackHandler.removeHandler(_keypairDelegateHandleId!);
+      _keypairDelegateCallbackHandler.removeHandler(_keypairDelegateHandleId);
     }
     _invokeCallbacks.clear();
     _subscriptionCallbacks.clear();
@@ -996,10 +984,10 @@ class ChipDeviceController implements MethodCallHandler {
       }
       
     // if (attestationDelegate != null) {
-      this.deviceAttestationDelegate = attestationDelegate;
+      deviceAttestationDelegate = attestationDelegate;
     // }
     // if (completionListener != null) {
-      this._completionListener = completionListener;
+      _completionListener = completionListener;
     // }
     await _requestPlatform('pairDevice', jsonEncode({
       jsonKeyHandle: _platformDeviceControllerHandle,

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_matter/flutter_matter.dart';
 import 'package:flutter_matter_example/device_provisioning.dart';
@@ -92,7 +91,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Onboarding'),
+        title: const Text('Onboarding'),
       ),
       body:  Stack(
         children: [
@@ -102,7 +101,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              padding: EdgeInsets.all(6),
+              padding: const EdgeInsets.all(6),
               color: Colors.white38,
               child: Row(
                 children: [
@@ -115,7 +114,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
                     onPressed: () async {
                       parserCode(_editingController.text);
                     },
-                    child: Text('Submit')
+                    child: const Text('Submit')
                   )
                 ],
               ),
